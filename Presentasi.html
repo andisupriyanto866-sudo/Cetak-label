@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PENCARIAN BARANG OVERFLOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-200:#bfdbfe;--blue-300:#93c5fd;
+  --blue-400:#60a5fa;--blue-500:#3b82f6;--blue-600:#2563eb;--blue-700:#1d4ed8;
+  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;
+  --slate-400:#94a3b8;--slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;--slate-800:#1e293b;
+  --danger:#ef4444;--danger-light:#fee2e2;--success:#10b981;
+  --shadow:0 4px 16px rgba(37,99,235,.10),0 1px 4px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 40px rgba(37,99,235,.13),0 2px 8px rgba(0,0,0,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',-apple-system,sans-serif;background:linear-gradient(160deg,#e8f0fe 0%,#f0f7ff 40%,#fff 70%,#f8fafc 100%);min-height:100vh;color:var(--slate-800);overflow-x:hidden}
+.bg-deco{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.bg-deco-circle{position:absolute;border-radius:50%}
+.bg-deco-circle:nth-child(1){width:700px;height:700px;top:-300px;right:-200px;background:radial-gradient(circle,rgba(59,130,246,.10) 0%,transparent 70%);animation:driftA 22s ease-in-out infinite}
+.bg-deco-circle:nth-child(2){width:500px;height:500px;bottom:-200px;left:-150px;background:radial-gradient(circle,rgba(37,99,235,.07) 0%,transparent 70%);animation:driftB 28s ease-in-out infinite}
+.bg-deco-circle:nth-child(3){width:300px;height:300px;top:40%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(147,197,253,.12) 0%,transparent 70%);animation:driftA 18s ease-in-out infinite reverse}
+@keyframes driftA{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-40px)}}
+@keyframes driftB{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,30px)}}
+.container{position:relative;z-index:1;width:100%;max-width:540px;margin:0 auto;min-height:100vh;padding:28px 18px 48px}
+/* Header */
+.header{text-align:center;margin-bottom:28px;padding-top:8px}
+.header-logo{width:64px;height:64px;background:linear-gradient(135deg,var(--blue-500),var(--blue-700));border-radius:20px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 32px rgba(37,99,235,.30);margin-bottom:16px;animation:logoFloat 4s ease-in-out infinite}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.header-badge{display:inline-flex;align-items:center;gap:7px;background:var(--blue-50);border:1.5px solid var(--blue-200);padding:5px 14px;border-radius:50px;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue-600);margin-bottom:14px}
+.header-badge::before{content:'';width:7px;height:7px;background:var(--success);border-radius:50%;animation:pulseDot 2s infinite}
+@keyframes pulseDot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(16,185,129,0)}}
+.header h1{font-size:24px;font-weight:900;color:var(--slate-800);letter-spacing:-.5px;line-height:1.2}
+.header h1 span{color:var(--blue-600)}
+.header-subtitle{font-size:13px;color:var(--slate-500);margin-top:8px;font-weight:400}
+/* Search */
+.search-wrapper{position:relative;margin-bottom:18px}
+.search-outer{border-radius:18px;background:white;box-shadow:var(--shadow-lg);border:1.5px solid var(--blue-100);transition:all .3s}
+.search-outer:focus-within{border-color:var(--blue-400);box-shadow:0 0 0 4px rgba(59,130,246,.12),var(--shadow-lg)}
+#search{width:100%;padding:16px 52px 16px 50px;border:none;border-radius:18px;font-size:15px;font-family:'Inter',sans-serif;background:transparent;color:var(--slate-800);outline:none}
+#search::placeholder{color:var(--slate-400)}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.5;pointer-events:none}
+.search-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--slate-100);border:1.5px solid var(--slate-200);color:var(--slate-500);font-size:11px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .2s}
+.search-clear:hover{background:var(--danger);color:white;border-color:var(--danger)}
+.search-clear.visible{display:flex}
+/* Stats */
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.stat-item{background:white;border-radius:16px;padding:16px 8px;text-align:center;box-shadow:var(--shadow);border:1.5px solid var(--blue-50);transition:all .25s}
+.stat-item:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--blue-100)}
+.stat-icon{font-size:18px;margin-bottom:4px}
+.stat-value{font-size:26px;font-weight:900;line-height:1;color:var(--blue-600)}
+.stat-label{font-size:10px;color:var(--slate-400);margin-top:4px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+/* Actions */
+.actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.action-btn{background:white;border:1.5px solid var(--slate-200);border-radius:16px;padding:16px 6px;text-align:center;cursor:pointer;transition:all .25s;color:var(--slate-700);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;outline:none;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.action-btn:hover{border-color:var(--blue-300);color:var(--blue-600);transform:translateY(-2px);box-shadow:var(--shadow)}
+.action-btn:active{transform:scale(.97)}
+.action-btn .icon{font-size:22px;display:block;margin-bottom:6px}
+.action-btn.primary{background:linear-gradient(135deg,var(--blue-500),var(--blue-700));border-color:transparent;color:white;box-shadow:0 6px 24px rgba(37,99,235,.28)}
+.action-btn.primary:hover{box-shadow:0 10px 36px rgba(37,99,235,.38);border-color:transparent}
+/* Cards */
+.result-card{background:white;border-radius:20px;padding:22px;margin-bottom:14px;box-shadow:var(--shadow-lg);border:1.5px solid var(--blue-50);animation:slideUp .45s cubic-bezier(.16,1,.3,1) forwards;position:relative;overflow:hidden}
+.result-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,var(--blue-400),var(--blue-600))}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:8px}
+.card-brand{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:white;padding:5px 13px;border-radius:50px;font-size:11px;font-weight:700}
+.card-timestamp{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--slate-400);background:var(--slate-50);border:1px solid var(--slate-200);padding:4px 10px;border-radius:50px;font-weight:500}
+.card-body{display:grid;gap:12px}
+.field-group{display:flex;flex-direction:column;gap:3px}
+.field-label{font-size:10px;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:1px}
+.field-value{font-size:15px;font-weight:600;color:var(--slate-700);word-break:break-word;line-height:1.4}
+.field-value.location{font-size:28px;font-weight:900;color:var(--blue-600);line-height:1.1;letter-spacing:-.5px}
+.card-divider{height:1px;background:var(--slate-100)}
+.card-actions{display:flex;gap:10px;margin-top:18px;padding-top:14px;border-top:1.5px solid var(--slate-100)}
+.card-btn{flex:1;padding:10px 12px;border-radius:10px;border:1.5px solid var(--slate-200);background:var(--slate-50);color:var(--slate-600);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;outline:none}
+.card-btn.copy:hover{background:var(--blue-50);color:var(--blue-600);border-color:var(--blue-200)}
+.card-btn.delete:hover{background:var(--danger-light);color:var(--danger);border-color:#fca5a5}
+/* Not Found */
+.not-found{text-align:center;padding:50px 20px;animation:slideUp .4s ease}
+.not-found-icon{font-size:64px;margin-bottom:14px;display:inline-block;animation:confused 2s ease-in-out infinite}
+@keyframes confused{0%,100%{transform:rotate(-8deg)}25%{transform:rotate(8deg) translateY(-5px)}50%{transform:rotate(-5deg)}75%{transform:rotate(5deg) translateY(-3px)}}
+.not-found h3{font-size:17px;font-weight:700;color:var(--slate-700);margin-bottom:6px}
+.not-found p{font-size:13px;color:var(--slate-400)}
+/* Table */
+.table-section{background:white;border-radius:20px;overflow:hidden;margin-top:14px;animation:slideUp .4s ease;display:none;border:1.5px solid var(--blue-100);box-shadow:var(--shadow-lg)}
+.table-section.active{display:block}
+.table-header{padding:16px 20px;background:linear-gradient(135deg,var(--blue-50),white);border-bottom:1.5px solid var(--blue-100);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.table-header h3{font-size:14px;font-weight:800;color:var(--slate-700)}
+.table-scroll{overflow-x:auto;max-height:420px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.table-scroll::-webkit-scrollbar{width:5px;height:5px}
+.table-scroll::-webkit-scrollbar-track{background:var(--slate-50)}
+.table-scroll::-webkit-scrollbar-thumb{background:var(--blue-200);border-radius:3px}
+table{width:100%;min-width:600px;border-collapse:collapse;font-size:12px}
+th{background:linear-gradient(to bottom,var(--blue-50),var(--slate-50));color:var(--blue-700);font-weight:800;text-align:left;padding:12px 16px;position:sticky;top:0;white-space:nowrap;border-bottom:2px solid var(--blue-100);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:11px 16px;border-bottom:1px solid var(--slate-100);color:var(--slate-600);white-space:nowrap;font-size:13px}
+tr:hover td{background:var(--blue-50);color:var(--slate-800)}
+tr:last-child td{border-bottom:none}
+/* Form */
+.input-section{background:white;border-radius:20px;padding:24px;margin-top:14px;animation:slideUp .4s ease;display:none;border:1.5px solid var(--blue-100);box-shadow:var(--shadow-lg)}
+.input-section.active{display:block}
+.form-title{font-size:18px;font-weight:900;color:var(--slate-800);margin-bottom:6px}
+.form-desc{font-size:13px;color:var(--slate-400);margin-bottom:22px;padding-bottom:18px;border-bottom:1.5px dashed var(--slate-200)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:11px;font-weight:700;color:var(--slate-500);margin-bottom:7px;text-transform:uppercase;letter-spacing:.6px}
+.form-input{width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--slate-200);background:var(--slate-50);color:var(--slate-800);font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:all .25s}
+.form-input:focus{border-color:var(--blue-400);background:white;box-shadow:0 0 0 4px rgba(59,130,246,.10)}
+.form-input::placeholder{color:var(--slate-400)}
+.form-input[readonly]{background:var(--blue-50);color:var(--blue-600);font-weight:600;border-color:var(--blue-100)}
+.brand-label{display:block;font-size:11px;font-weight:700;color:var(--slate-500);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px}
+.brand-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}
+.brand-chip{padding:10px 6px;border-radius:10px;border:1.5px solid var(--slate-200);background:var(--slate-50);color:var(--slate-600);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;outline:none}
+.brand-chip:hover{border-color:var(--blue-300);color:var(--blue-600);background:var(--blue-50)}
+.brand-chip.selected{background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:white;border-color:transparent;box-shadow:0 4px 14px rgba(37,99,235,.30)}
+.submit-btn{width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--blue-500),var(--blue-700));color:white;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .3s;box-shadow:0 8px 28px rgba(37,99,235,.32);display:flex;align-items:center;justify-content:center;gap:8px;outline:none}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(37,99,235,.40)}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+/* Notif */
+#notif{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);background:linear-gradient(135deg,#10b981,#059669);color:white;padding:13px 22px;border-radius:14px;font-size:13px;font-weight:700;box-shadow:0 12px 40px rgba(0,0,0,.15);opacity:0;pointer-events:none;transition:all .5s cubic-bezier(.16,1,.3,1);z-index:9999;display:flex;align-items:center;gap:9px;white-space:nowrap;border:1.5px solid rgba(255,255,255,.2)}
+#notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#notif.error{background:linear-gradient(135deg,#ef4444,#dc2626)}
+/* Loading */
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);z-index:9998;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px}
+.loading-overlay.active{display:flex}
+.spinner-wrap{width:64px;height:64px;background:white;border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(37,99,235,.18)}
+.spinner{width:36px;height:36px;border:3px solid var(--blue-100);border-top-color:var(--blue-500);border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:14px;color:var(--blue-600);font-weight:700;background:white;padding:8px 20px;border-radius:50px;box-shadow:var(--shadow)}
+@media(max-width:400px){.brand-grid{grid-template-columns:repeat(2,1fr)}.actions-grid{grid-template-columns:1fr 1fr}.actions-grid .action-btn:nth-child(3){grid-column:span 2}.header h1{font-size:20px}.stat-value{font-size:22px}}
+html{scroll-behavior:smooth}
+::selection{background:var(--blue-100);color:var(--blue-800)}
+</style>
+</head>
+<body>
+<div class="bg-deco">
+  <div class="bg-deco-circle"></div>
+  <div class="bg-deco-circle"></div>
+  <div class="bg-deco-circle"></div>
+</div>
+<div class="container">
+  <div class="header">
+    <div class="header-logo">📦</div>
+    <div class="header-badge">National Distribution Center</div>
+    <h1>PENCARIAN BARANG <span>OVERFLOW</span></h1>
+    <div class="header-subtitle">Temukan lokasi barang overflow dengan cepat &amp; akurat</div>
+  </div>
+  <div class="search-wrapper">
+    <span class="search-icon">🔍</span>
+    <div class="search-outer">
+      <input type="text" id="search" placeholder="Cari Handling Unit / Odoo / Brand / Lokasi..." autocomplete="off">
+    </div>
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-icon">📋</div><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Data</div></div>
+    <div class="stat-item"><div class="stat-icon">🏷️</div><div class="stat-value" id="statBrands">0</div><div class="stat-label">Brand</div></div>
+    <div class="stat-item"><div class="stat-icon">📍</div><div class="stat-value" id="statLocations">0</div><div class="stat-label">Lokasi</div></div>
+  </div>
+  <div class="actions-grid">
+    <button class="action-btn" id="btnTable" onclick="toggleTable()"><span class="icon">📂</span>Data Asli</button>
+    <button class="action-btn primary" id="btnInput" onclick="toggleInput()"><span class="icon">➕</span>Input OVF</button>
+    <button class="action-btn" id="btnRefresh" onclick="loadData()"><span class="icon">🔄</span>Refresh</button>
+  </div>
+  <div id="searchResult"></div>
+  <div class="table-section" id="tableWrapper">
+    <div class="table-header">
+      <h3>📂 Data Asli</h3>
+      <button class="card-btn delete" onclick="toggleTable()" style="flex:0;padding:8px 14px;border-radius:10px;">✕ Tutup</button>
+    </div>
+    <div class="table-scroll">
+      <table id="table"><thead></thead><tbody></tbody></table>
+    </div>
+  </div>
+  <div class="input-section" id="inputForm">
+    <div class="form-title">➕ Input Data OVF</div>
+    <div class="form-desc">Isi semua kolom di bawah untuk menambah data baru</div>
+    <div class="form-group"><label>🕐 Timestamp</label><input id="f_timestamp" class="form-input" readonly></div>
+    <div class="form-group"><label>📦 Handling Unit</label><input id="f_handling" class="form-input" placeholder="Masukkan Handling Unit"></div>
+    <div class="form-group"><label>📝 Kode Odoo</label><input id="f_oddo" class="form-input" placeholder="Masukkan Kode Odoo"></div>
+    <div class="form-group"><label>📍 Lokasi</label><input id="f_lokasi" class="form-input" placeholder="Masukkan Lokasi"></div>
+    <label class="brand-label">🏷️ Pilih Brand</label>
+    <div class="brand-grid">
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Wardah')">Wardah</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Emina')">Emina</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'OMG')">OMG</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Tavi')">Tavi</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Beyondly')">Beyondly</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Biodef')">Biodef</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Parama')">Parama</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Make Over')">Make Over</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Earth Love Live')">Earth Love Live</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'Putri')">Putri</button>
+      <button type="button" class="brand-chip" onclick="pilihBrand(this,'DLL')">DLL</button>
+    </div>
+    <input type="hidden" id="f_brand">
+    <button type="button" class="submit-btn" id="submitBtn" onclick="kirimData()">💾 Simpan Data</button>
+  </div>
+</div>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner-wrap"><div class="spinner"></div></div>
+  <div class="loading-text">⏳ Memuat data...</div>
+</div>
+<div id="notif"></div>
+<script>
+const sheetCSV="https://docs.google.com/spreadsheets/d/1SPBkGyRiy0OUbAic2QF0YSzCZq0Vyl5e6vnOPgzRW5k/export?format=csv";
+const scriptURL="https://script.google.com/macros/s/AKfycby_2dE5rMKeoPTeOsdoiH4NM6ggI8-Ij8RBh571klHTubTyNycr_qpWW-b3XuMyQ53J/exec";
+let allData=[],isTableOpen=false,isInputOpen=false,isLoading=false;
+document.addEventListener('DOMContentLoaded',function(){
+  loadData();
+  const si=document.getElementById('search'),sc=document.getElementById('searchClear');
+  si.addEventListener('input',function(){sc.classList.toggle('visible',this.value.length>0);doSearch(this.value);});
+  si.addEventListener('keydown',function(e){if(e.key==='Escape')clearSearch();});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){if(isTableOpen)toggleTable();if(isInputOpen)toggleInput();clearSearch();}
+    if(e.key==='/'&&!isInp(document.activeElement)){e.preventDefault();si.focus();}
+  });
+});
+function isInp(el){return el&&(el.tagName==='INPUT'||el.tagName==='TEXTAREA'||el.isContentEditable);}
+function loadData(){
+  if(isLoading)return;isLoading=true;showLoading(true);showNotif('Memuat data...',false,2000);
+  fetch(sheetCSV).then(r=>{if(!r.ok)throw new Error();return r.text();})
+  .then(csv=>{allData=parseCSV(csv.trim());renderTable(allData);updateStats();const sv=document.getElementById('search').value;if(sv)doSearch(sv);showLoading(false);isLoading=false;showNotif('Data berhasil dimuat!');})
+  .catch(()=>{showLoading(false);isLoading=false;showNotif('Gagal memuat data.',true);});
+}
+function parseCSV(t){const lines=t.split(/\r?\n/),res=[];for(let line of lines){if(!line.trim())continue;const row=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){const c=line[i],n=line[i+1];if(c==='"'){if(inQ&&n==='"'){cur+='"';i++;}else inQ=!inQ;}else if(c===','&&!inQ){row.push(cur.trim());cur='';}else cur+=c;}row.push(cur.trim());res.push(row);}return res;}
+function renderTable(rows){const th=document.querySelector('#table thead'),tb=document.querySelector('#table tbody');if(!rows.length){th.innerHTML='';tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:#94a3b8">Tidak ada data</td></tr>';return;}let hH='<tr>';rows[0].forEach(c=>{hH+=`<th>${esc(c)}</th>`;});hH+='</tr>';th.innerHTML=hH;let bH='';for(let i=1;i<rows.length;i++){bH+='<tr>';rows[i].forEach(c=>{bH+=`<td>${esc(c)}</td>`;});bH+='</tr>';}tb.innerHTML=bH;}
+function esc(t){if(t==null)return'';const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+function updateStats(){const total=allData.length>0?allData.length-1:0;const brands=new Set(),locs=new Set();for(let i=1;i<allData.length;i++){if(allData[i][4])brands.add(allData[i][4].trim());if(allData[i][3])locs.add(allData[i][3].trim());}anim('statTotal',total);anim('statBrands',brands.size);anim('statLocations',locs.size);}
+function anim(id,target){const el=document.getElementById(id),start=parseInt(el.innerText)||0;if(start===target)return;const dur=900,t0=performance.now();function u(t){const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);el.innerText=Math.round(start+(target-start)*e);if(p<1)requestAnimationFrame(u);}requestAnimationFrame(u);}
+function toggleTable(){const w=document.getElementById('tableWrapper'),f=document.getElementById('inputForm');if(isTableOpen){w.classList.remove('active');isTableOpen=false;}else{if(isInputOpen){f.classList.remove('active');isInputOpen=false;}w.classList.add('active');isTableOpen=true;setTimeout(()=>w.scrollIntoView({behavior:'smooth',block:'start'}),100);}}
+function toggleInput(){const f=document.getElementById('inputForm'),w=document.getElementById('tableWrapper');if(isInputOpen){f.classList.remove('active');isInputOpen=false;}else{if(isTableOpen){w.classList.remove('active');isTableOpen=false;}resetForm();document.getElementById('f_timestamp').value=getTs();f.classList.add('active');isInputOpen=true;setTimeout(()=>{f.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('f_handling').focus();},100);}}
+function resetForm(){['f_handling','f_oddo','f_lokasi','f_brand','f_timestamp'].forEach(id=>{document.getElementById(id).value='';});document.querySelectorAll('.brand-chip').forEach(c=>c.classList.remove('selected'));}
+function pilihBrand(el,nama){document.querySelectorAll('.brand-chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');document.getElementById('f_brand').value=nama;}
+function doSearch(query){const box=document.getElementById('searchResult');box.innerHTML='';if(!query||!query.trim())return;const filter=query.toLowerCase().trim();let results=[];for(let i=1;i<allData.length;i++){if(allData[i].join(' ').toLowerCase().includes(filter))results.push({row:allData[i]});}
+if(!results.length){box.innerHTML='<div class="not-found"><div class="not-found-icon">🤔</div><h3>Lokasi tidak ditemukan</h3><p>Update data terlebih dahulu ya...</p></div>';return;}
+results.slice(0,20).forEach((item,index)=>{setTimeout(()=>{const r=item.row,card=document.createElement('div');card.className='result-card';const ts=esc(r[0]||'-'),hu=esc(r[1]||'-'),od=esc(r[2]||'-'),lo=esc(r[3]||'-'),br=esc(r[4]||'-');card.innerHTML=`<div class="card-header"><span class="card-brand">🏷️ ${br}</span><span class="card-timestamp">🕐 ${ts}</span></div><div class="card-body"><div class="field-group"><div class="field-label">📦 Handling Unit</div><div class="field-value">${hu}</div></div><div class="card-divider"></div><div class="field-group"><div class="field-label">📝 Kode Odoo</div><div class="field-value">${od}</div></div><div class="card-divider"></div><div class="field-group"><div class="field-label">📍 Lokasi</div><div class="field-value location">${lo}</div></div></div><div class="card-actions"><button type="button" class="card-btn copy" onclick="copyToClipboard('${lo.replace(/'/g,"\\'")}')">📋 Copy Lokasi</button><button type="button" class="card-btn delete" onclick="hapusData('${hu.replace(/'/g,"\\'")}','${od.replace(/'/g,"\\'")}')">🗑️ Hapus</button></div>`;box.appendChild(card);},index*70);});
+if(results.length>20)setTimeout(()=>{const info=document.createElement('div');info.style.cssText='text-align:center;padding:14px;color:#94a3b8;font-size:12px;font-weight:600';info.textContent=`...dan ${results.length-20} hasil lainnya. Persempit pencarian.`;box.appendChild(info);},20*70+100);}
+function clearSearch(){document.getElementById('search').value='';document.getElementById('searchResult').innerHTML='';document.getElementById('searchClear').classList.remove('visible');}
+function copyToClipboard(text){if(!text||text==='-'){showNotif('Tidak ada lokasi untuk disalin',true);return;}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>showNotif('Lokasi disalin ke clipboard!')).catch(()=>fbCopy(text));}else fbCopy(text);}
+function fbCopy(text){const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showNotif('Lokasi disalin ke clipboard!');}catch{showNotif('Gagal menyalin',true);}document.body.removeChild(ta);}
+function kirimData(){const ts=document.getElementById('f_timestamp').value,hu=document.getElementById('f_handling').value.trim(),od=document.getElementById('f_oddo').value.trim(),lo=document.getElementById('f_lokasi').value.trim(),br=document.getElementById('f_brand').value.trim(),btn=document.getElementById('submitBtn');if(!hu){showNotif('Handling Unit wajib diisi',true);document.getElementById('f_handling').focus();return;}if(!od){showNotif('Kode Odoo wajib diisi',true);document.getElementById('f_oddo').focus();return;}if(!lo){showNotif('Lokasi wajib diisi',true);document.getElementById('f_lokasi').focus();return;}if(!br){showNotif('Brand wajib dipilih',true);return;}btn.disabled=true;btn.innerHTML='⏳ Mengirim...';showNotif('Mengirim data...',false,3000);fetch(scriptURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({timestamp:ts,handling:hu,oddo:od,lokasi:lo,brand:br})}).then(()=>{showNotif('Data berhasil dikirim!');resetForm();document.getElementById('f_timestamp').value=getTs();setTimeout(()=>loadData(),2000);}).catch(()=>showNotif('Gagal mengirim data.',true)).finally(()=>{btn.disabled=false;btn.innerHTML='💾 Simpan Data';});}
+function hapusData(handling,oddo){if(!handling||!oddo){showNotif('Data tidak valid',true);return;}if(!confirm('Yakin ingin menghapus?\n\nHandling: '+handling+'\nOdoo: '+oddo))return;showNotif('Menghapus...',false,2000);fetch(scriptURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delete',handling,oddo})}).then(()=>{showNotif('Data berhasil dihapus');clearSearch();setTimeout(()=>loadData(),1500);}).catch(()=>showNotif('Gagal menghapus',true));}
+function getTs(){const n=new Date(),p=v=>String(v).padStart(2,'0');return`${n.getFullYear()}-${p(n.getMonth()+1)}-${p(n.getDate())} ${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;}
+function showNotif(text,error=false,dur=2500){const n=document.getElementById('notif');n.innerHTML=(error?'⚠️ ':'✅ ')+text;n.classList.remove('error','show');if(error)n.classList.add('error');void n.offsetWidth;requestAnimationFrame(()=>n.classList.add('show'));if(n._t)clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),dur);}
+function showLoading(show){document.getElementById('loadingOverlay').classList.toggle('active',show);}
+</script>
+</body>
+</html>
